@@ -1,6 +1,6 @@
 {
   "name": "yamldb",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A document database which stores documents as YAML files. Update, add, remove and view database items by editing files.",
   "main": "index.js",
   "scripts": {
@@ -22,8 +22,8 @@
     }
   ],
   "dependencies": {
-    "yamljs": "0.0.0",
-    "underscore": "0.0.0"
+    "yamljs": ">=0",
+    "underscore": ">=0"
   },
   "bugs": {
     "url": "https://github.com/vpj/yamldb/issues"
