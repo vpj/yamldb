@@ -1,0 +1,7 @@
+handle: apple
+name: Apple
+price: 20.00
+description: "The apple is the pomaceous fruit of the apple tree, Malus domestica of the rose family. It is one of the most widely cultivated tree fruits, and the most widely known of the many members of genus Malus that are used by humans."
+images:
+ - red_apples.jpg
+ - green_apples.jpg

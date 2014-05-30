@@ -1,0 +1,7 @@
+handle: banana
+name: Banana
+price: 10.00
+description: "A banana is an edible fruit produced by several kinds of large herbaceous flowering plants in the genus Musa."
+images:
+ - banana.jpg
+ - banana2.jpg

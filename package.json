@@ -1,0 +1,32 @@
+{
+  "name": "yamldb",
+  "version": "0.0.0",
+  "description": "A document database which stores documents as YAML files. Update, add, remove and view database items by editing files.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vpj/weya.git"
+  },
+  "keywords": [
+    "yaml",
+    "database"
+  ],
+  "author": "Varuna Jayasiri",
+  "license": [
+    {
+      "type" : "MIT",
+      "url" : "https://github.com/caolan/async/raw/master/LICENSE"
+    }
+  ],
+  "dependencies": {
+    "yamljs": "0.0.0",
+    "underscore": "0.0.0"
+  },
+  "bugs": {
+    "url": "https://github.com/vpj/weya/issues"
+  },
+  "homepage": "https://github.com/vpj/weya"
+}
