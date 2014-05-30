@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/vpj/weya.git"
+    "url": "https://github.com/vpj/yamldb.git"
   },
   "keywords": [
     "yaml",
@@ -26,7 +26,7 @@
     "underscore": "0.0.0"
   },
   "bugs": {
-    "url": "https://github.com/vpj/weya/issues"
+    "url": "https://github.com/vpj/yamldb/issues"
   },
-  "homepage": "https://github.com/vpj/weya"
+  "homepage": "https://github.com/vpj/yamldb"
 }
