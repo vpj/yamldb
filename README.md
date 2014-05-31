@@ -20,7 +20,9 @@ Storing the database as separate files lets you use version control systems like
 
     npm install yamldb
 
-##Example in [Coffeescript](http://www.coffeescript.org)
+##[Documentation](http://vpj.github.io/yamldb/)
+
+##[Example.coffee](http://vpj.github.io/yamldb/example.html)
 
     yamldb = require 'yamldb'
 
