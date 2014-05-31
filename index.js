@@ -73,7 +73,7 @@
       return fs.writeFile(file, data, {
         encoding: 'utf8'
       }, function(err) {
-        return callback();
+        return callback(err);
       });
     };
 

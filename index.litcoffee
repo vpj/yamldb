@@ -62,7 +62,7 @@ Each model should be a subclass of `Model` class.
      save: (model, data, file, callback) ->
       data = YAML.stringify data, 1000, 1
       fs.writeFile file, data, encoding: 'utf8', (err) ->
-       callback()
+       callback err
 
 ####Load files
 This will load all the files of type `model` recursing over the subdirectories.
