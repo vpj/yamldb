@@ -36,20 +36,26 @@ Find files in a directory
      recurse dir
 
 ## Database
+Setup the database with a set of models and a directory. The models will reside in subdirectories with the same name.
+
+Each model should be a subclass of `Model` class.
 
     class Database
      constructor: (path, models) ->
       @models = models
       @path = path
 
-     initialize: ->
+####Save a model
 
      save: (model, data, file, callback) ->
       data = YAML.stringify data, 1000, 1
       fs.writeFile file, data, encoding: 'utf8', (err) ->
        callback()
 
-     loadModels: (model, callback) -> #Loads all files
+####Load files
+This will load all the files of type `model` recursing over the subdirectories.
+
+     loadFiles: (model, callback) ->
       path = "#{@path}/#{model}"
       objs = []
       files = []
@@ -69,8 +75,16 @@ Find files in a directory
        files = f
        loadFile()
 
+####Load file
+Loads a single file of type model
+
      loadFile: (model, file, callback) ->
       fs.readFile file, encoding: 'utf8', (err, data) =>
+       if err?
+        console.log "Error reading file: #{file}", err
+        callback null
+        return
+
        try
         data = YAML.parse data
        catch e
@@ -154,6 +168,9 @@ Build a model with the structure of defaults. `options.db` is a reference to the
       return unless @file?
 
       @db.save @model, @toJSON(), @file, callback
+
+
+#Exports
 
     exports.Database = Database
     exports.Model = Model

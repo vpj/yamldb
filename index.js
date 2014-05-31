@@ -54,8 +54,6 @@
       this.path = path;
     }
 
-    Database.prototype.initialize = function() {};
-
     Database.prototype.save = function(model, data, file, callback) {
       data = YAML.stringify(data, 1000, 1);
       return fs.writeFile(file, data, {
@@ -65,7 +63,7 @@
       });
     };
 
-    Database.prototype.loadModels = function(model, callback) {
+    Database.prototype.loadFiles = function(model, callback) {
       var files, loadFile, n, objs, path;
       path = "" + this.path + "/" + model;
       objs = [];
@@ -96,6 +94,11 @@
       }, (function(_this) {
         return function(err, data) {
           var e;
+          if (err != null) {
+            console.log("Error reading file: " + file, err);
+            callback(null);
+            return;
+          }
           try {
             data = YAML.parse(data);
           } catch (_error) {
