@@ -66,25 +66,28 @@
     };
 
     Database.prototype.loadModels = function(model, callback) {
-      var objs, path;
+      var files, loadFile, n, objs, path;
       path = "" + this.path + "/" + model;
       objs = [];
-      return findFiles(path, (function(_this) {
-        return function(files) {
-          var file, _i, _len, _results;
-          _results = [];
-          for (_i = 0, _len = files.length; _i < _len; _i++) {
-            file = files[_i];
-            _results.push(_this.loadFile(model, file, function(obj) {
-              objs.push(obj);
-              if (objs.length === files.length) {
-                return callback(objs);
-              }
-            }));
+      files = [];
+      n = 0;
+      loadFile = (function(_this) {
+        return function() {
+          if (n >= files.length) {
+            callback(objs);
+            return;
           }
-          return _results;
+          return _this.loadFile(model, files[n], function(obj) {
+            objs.push(obj);
+            n++;
+            return loadFile();
+          });
         };
-      })(this));
+      })(this);
+      return findFiles(path, function(f) {
+        files = f;
+        return loadFile();
+      });
     };
 
     Database.prototype.loadFile = function(model, file, callback) {
@@ -92,7 +95,15 @@
         encoding: 'utf8'
       }, (function(_this) {
         return function(err, data) {
-          data = YAML.parse(data);
+          var e;
+          try {
+            data = YAML.parse(data);
+          } catch (_error) {
+            e = _error;
+            console.log("Error parsing file: " + file, e);
+            callback(null);
+            return;
+          }
           return callback(new _this.models[model](data, {
             file: file,
             db: _this
@@ -162,6 +173,9 @@
       }
       this.db = options.db;
       this.values = {};
+      if (values == null) {
+        values = {};
+      }
       _ref = this._defaults;
       _results = [];
       for (k in _ref) {

@@ -52,17 +52,31 @@ Find files in a directory
      loadModels: (model, callback) -> #Loads all files
       path = "#{@path}/#{model}"
       objs = []
+      files = []
+      n = 0
 
-      findFiles path, (files) =>
-       for file in files
-        @loadFile model, file, (obj) ->
-         objs.push obj
-         if objs.length is files.length
-          callback objs
+      loadFile = =>
+       if n >= files.length
+        callback objs
+        return
+
+       @loadFile model, files[n], (obj) ->
+        objs.push obj
+        n++
+        loadFile()
+
+      findFiles path, (f) ->
+       files = f
+       loadFile()
 
      loadFile: (model, file, callback) ->
       fs.readFile file, encoding: 'utf8', (err, data) =>
-       data = YAML.parse data
+       try
+        data = YAML.parse data
+       catch e
+        console.log "Error parsing file: #{file}", e
+        callback null
+        return
        callback new @models[model] data, file: file, db: this
 
 
@@ -113,6 +127,7 @@ Build a model with the structure of defaults. `options.db` is a reference to the
       @file = options.file if options.file?
       @db = options.db
       @values = {}
+      values ?= {}
       for k, v of @_defaults
        if values[k]?
         @values[k] = values[k]
