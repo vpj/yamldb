@@ -4,7 +4,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  yamldb = require('./yamldb');
+  yamldb = require('./index');
 
   Fruit = (function(_super) {
     __extends(Fruit, _super);
@@ -31,8 +31,8 @@
 
   db = new yamldb.Database('testdata', models);
 
-  db.loadModels('Fruit', function(models) {
-    return console.log(models);
+  db.loadFiles('Fruit', function(err, objs) {
+    return console.log(err, objs);
   });
 
 }).call(this);

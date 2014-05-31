@@ -1,4 +1,6 @@
-    yamldb = require './yamldb'
+    yamldb = require './index'
+
+A basic database model
 
     class Fruit extends yamldb.Model
      @defaults
@@ -11,8 +13,12 @@
     models =
      Fruit: Fruit
 
+Initialize database
+
     db = new yamldb.Database 'testdata', models
 
-    db.loadModels 'Fruit', (models) ->
-     console.log models
+Load all objects of model *Fruit*
+
+    db.loadFiles 'Fruit', (err, objs) ->
+     console.log err, objs
 

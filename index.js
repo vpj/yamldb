@@ -9,24 +9,38 @@
   _ = require('underscore');
 
   findFiles = function(dir, callback) {
-    var callbackCount, done, fileList, recurse;
+    var callbackCount, done, err, fileList, recurse;
     fileList = [];
+    err = [];
     callbackCount = 0;
     done = function() {
       callbackCount--;
       if (callbackCount === 0) {
-        return callback(fileList);
+        if (err.length === 0) {
+          err = null;
+        }
+        return callback(err, fileList);
       }
     };
     recurse = function(path) {
       callbackCount++;
-      return fs.readdir(path, function(err1, files) {
+      return fs.readdir(path, function(e1, files) {
         var file, _fn, _i, _len;
+        if (e1 != null) {
+          err.push(e1);
+          done();
+          return;
+        }
         _fn = function(file) {
           var f;
           f = "" + path + "/" + file;
           callbackCount++;
-          return fs.stat(f, function(err2, stats) {
+          return fs.stat(f, function(e2, stats) {
+            if (e2 != null) {
+              err.push(e2);
+              done();
+              return;
+            }
             if (stats.isDirectory()) {
               recurse(f);
             } else if (stats.isFile()) {
@@ -64,25 +78,37 @@
     };
 
     Database.prototype.loadFiles = function(model, callback) {
-      var files, loadFile, n, objs, path;
+      var err, files, loadFile, n, objs, path;
       path = "" + this.path + "/" + model;
       objs = [];
       files = [];
+      err = [];
       n = 0;
       loadFile = (function(_this) {
         return function() {
           if (n >= files.length) {
-            callback(objs);
+            if (err.length === 0) {
+              err = null;
+            }
+            callback(err, objs);
             return;
           }
-          return _this.loadFile(model, files[n], function(obj) {
-            objs.push(obj);
+          return _this.loadFile(model, files[n], function(e, obj) {
+            if (e != null) {
+              err.push(e);
+            } else {
+              objs.push(obj);
+            }
             n++;
             return loadFile();
           });
         };
       })(this);
-      return findFiles(path, function(f) {
+      return findFiles(path, function(e, f) {
+        err = e;
+        if (err == null) {
+          err = [];
+        }
         files = f;
         return loadFile();
       });
@@ -92,22 +118,20 @@
       return fs.readFile(file, {
         encoding: 'utf8'
       }, (function(_this) {
-        return function(err, data) {
-          var e;
-          if (err != null) {
-            console.log("Error reading file: " + file, err);
-            callback(null);
+        return function(e1, data) {
+          var e2;
+          if (e1 != null) {
+            callback("Error reading file: " + file + ", " + e1, null);
             return;
           }
           try {
             data = YAML.parse(data);
           } catch (_error) {
-            e = _error;
-            console.log("Error parsing file: " + file, e);
-            callback(null);
+            e2 = _error;
+            callback("Error parsing file: " + file + ", " + e2, null);
             return;
           }
-          return callback(new _this.models[model](data, {
+          return callback(null, new _this.models[model](data, {
             file: file,
             db: _this
           }));

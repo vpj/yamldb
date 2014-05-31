@@ -8,23 +8,35 @@ Find files in a directory
 
     findFiles = (dir, callback) ->
      fileList = []
+     err = []
 
      callbackCount = 0
 
      done = ->
       callbackCount--
       if callbackCount is 0
-       callback fileList
+       err = null if err.length is 0
+       callback err, fileList
 
      recurse = (path) ->
       callbackCount++
-      fs.readdir path, (err1, files) ->
+      fs.readdir path, (e1, files) ->
+       if e1?
+        err.push e1
+        done()
+        return
+
        for file in files
         continue if file[0] is '.'
         do (file) ->
          f = "#{path}/#{file}"
          callbackCount++
-         fs.stat f, (err2, stats) ->
+         fs.stat f, (e2, stats) ->
+          if e2?
+           err.push e2
+           done()
+           return
+
           if stats.isDirectory()
            recurse f
           else if stats.isFile()
@@ -59,19 +71,26 @@ This will load all the files of type `model` recursing over the subdirectories.
       path = "#{@path}/#{model}"
       objs = []
       files = []
+      err = []
       n = 0
 
       loadFile = =>
        if n >= files.length
-        callback objs
+        err = null if err.length is 0
+        callback err, objs
         return
 
-       @loadFile model, files[n], (obj) ->
-        objs.push obj
+       @loadFile model, files[n], (e, obj) ->
+        if e?
+         err.push e
+        else
+         objs.push obj
         n++
         loadFile()
 
-      findFiles path, (f) ->
+      findFiles path, (e, f) ->
+       err = e
+       err ?= []
        files = f
        loadFile()
 
@@ -79,19 +98,18 @@ This will load all the files of type `model` recursing over the subdirectories.
 Loads a single file of type model
 
      loadFile: (model, file, callback) ->
-      fs.readFile file, encoding: 'utf8', (err, data) =>
-       if err?
-        console.log "Error reading file: #{file}", err
-        callback null
+      fs.readFile file, encoding: 'utf8', (e1, data) =>
+       if e1?
+        callback "Error reading file: #{file}, #{e1}", null
         return
 
        try
         data = YAML.parse data
-       catch e
-        console.log "Error parsing file: #{file}", e
-        callback null
+       catch e2
+        callback "Error parsing file: #{file}, #{e2}", null
         return
-       callback new @models[model] data, file: file, db: this
+       callback null, new @models[model] data, file: file, db: this
+
 
 
 
