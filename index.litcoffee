@@ -1,4 +1,21 @@
-Required repositories
+#YAML Database
+
+YAML database is a document database which stores documents as YAML files. The documents in the database can be maintained by simply editing the yaml files.
+
+This database was designed to be used for systems like CMS systems, where an easy way to edit data is necessary and the number of data objects is not very high. It can be also used to store settings and configurations.
+
+Storing the database as separate files lets you use version control systems like git on the database, which is again ideal for storing settings, configurations, blog posts and CMS content.
+
+###Advantages
+* Can easily change database entries
+* Can use version control on the database
+* Ideal for settings and configurations (user configs etc)
+
+
+###Disadvantages
+* No SQL or similar functionality (like searching the database)
+* Not suitable for storing transactional data
+
 
     fs = require 'fs'
     YAML = require "yamljs"
