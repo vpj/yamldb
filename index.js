@@ -77,6 +77,10 @@
       });
     };
 
+    Database.prototype.getPath = function(model) {
+      return "" + this.path + "/" + model;
+    };
+
     Database.prototype.loadFiles = function(model, callback) {
       var err, files, loadFile, n, objs, path;
       path = "" + this.path + "/" + model;
@@ -195,10 +199,15 @@
 
     Model.initialize(function(values, options) {
       var k, v, _ref, _results;
-      if (options.file != null) {
-        this.file = options.file;
-      }
+      this.file = options.file;
+      this.isNew = false;
       this.db = options.db;
+      if (this.file == null) {
+        this.isNew = true;
+        if (options.name != null) {
+          this.file = "" + (this.db.getPath(this.model)) + "/" + options.name + ".yaml";
+        }
+      }
       this.values = {};
       if (values == null) {
         values = {};
@@ -242,6 +251,7 @@
       if (this.file == null) {
         return;
       }
+      this.isNew = false;
       return this.db.save(this.model, this.toJSON(), this.file, callback);
     };
 

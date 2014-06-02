@@ -29,6 +29,8 @@ Storing the database as separate files lets you use version control systems like
 Define a object model
 
     class Fruit extends yamldb.Model
+     model: 'Fruit'
+
      @defaults
       handle: ''
       name: ''

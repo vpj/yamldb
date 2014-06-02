@@ -13,6 +13,8 @@
       return Fruit.__super__.constructor.apply(this, arguments);
     }
 
+    Fruit.prototype.model = 'Fruit';
+
     Fruit.defaults({
       handle: '',
       name: '',

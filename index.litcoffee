@@ -85,6 +85,8 @@ Each model should be a subclass of `Model` class.
 ####Load files
 This will load all the files of type `model` recursing over the subdirectories.
 
+     getPath: (model) -> "#{@path}/#{model}"
+
      loadFiles: (model, callback) ->
       path = "#{@path}/#{model}"
       objs = []
@@ -174,8 +176,14 @@ Subclasses can add to default key-values of parent classes
 Build a model with the structure of defaults. `options.db` is a reference to the `Database` object, which will be used when updating the object. `options.file` is the path of the file, which will be null if this is a new object.
 
      @initialize (values, options) ->
-      @file = options.file if options.file?
+      @file = options.file
+      @isNew = false
       @db = options.db
+      if not @file?
+       @isNew = true
+       if options.name?
+        @file = "#{@db.getPath @model}/#{options.name}.yaml"
+
       @values = {}
       values ?= {}
       for k, v of @_defaults
@@ -203,6 +211,7 @@ Build a model with the structure of defaults. `options.db` is a reference to the
      save: (callback) ->
       return unless @file?
 
+      @isNew = false
       @db.save @model, @toJSON(), @file, callback
 
 

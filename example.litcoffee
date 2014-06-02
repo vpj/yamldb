@@ -3,6 +3,8 @@
 A basic database model
 
     class Fruit extends yamldb.Model
+     model: 'Fruit'
+
      @defaults
       handle: ''
       name: ''
