@@ -120,13 +120,13 @@ Loads a single file of type model
      loadFile: (model, file, callback) ->
       fs.readFile file, encoding: 'utf8', (e1, data) =>
        if e1?
-        callback "Error reading file: #{file}, #{e1}", null
+        callback msg: "Error reading file: #{file}", err: e1, null
         return
 
        try
         data = YAML.parse data
        catch e2
-        callback "Error parsing file: #{file}, #{e2}", null
+        callback msg: "Error parsing file: #{file}", err: e2, null
         return
        callback null, new @models[model] data, file: file, db: this
 

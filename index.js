@@ -125,14 +125,20 @@
         return function(e1, data) {
           var e2;
           if (e1 != null) {
-            callback("Error reading file: " + file + ", " + e1, null);
+            callback({
+              msg: "Error reading file: " + file,
+              err: e1
+            }, null);
             return;
           }
           try {
             data = YAML.parse(data);
           } catch (_error) {
             e2 = _error;
-            callback("Error parsing file: " + file + ", " + e2, null);
+            callback({
+              msg: "Error parsing file: " + file,
+              err: e2
+            }, null);
             return;
           }
           return callback(null, new _this.models[model](data, {
