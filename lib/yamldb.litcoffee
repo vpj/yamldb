@@ -20,7 +20,6 @@ Storing the database as separate files lets you use version control systems like
 
     fs = require 'fs'
     YAML = require "yamljs"
-    _ = require 'underscore'
 
 Find files in a directory
 
@@ -140,17 +139,17 @@ Introduces class level function initialize and include. This class is the base c
      constructor: ->
       @_init.apply @, arguments
 
-     _initFuncs: []
+     _initialize: []
 
 ####Register initialize functions.
 All initializer funcitons in subclasses will be called with the constructor arguments.
 
      @initialize: (func) ->
-      @::_initFuncs = _.clone @::_initFuncs
-      @::_initFuncs.push func
+      @::_initialize = @::_initialize.slice()
+      @::_initialize.push func
 
      _init: ->
-      for init in @_initFuncs
+      for init in @_initialize
        init.apply @, arguments
 
 ####Include objects.
@@ -169,7 +168,7 @@ You can include objects by registering them with @include. This solves the probl
 Subclasses can add to default key-values of parent classes
 
      @defaults: (defaults) ->
-      @::_defaults = _.clone @::_defaults
+      @::_defaults = JSON.parse JSON.stringify @::_defaults
       for k, v of defaults
        @::_defaults[k] = v
 
@@ -194,7 +193,7 @@ Build a model with the structure of defaults. `options.db` is a reference to the
 
 ####Returns key value set
 
-     toJSON: -> _.clone @values
+     toJSON: -> JSON.parse JSON.stringify @values
 
 ####Get value of a given key
 

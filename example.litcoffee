@@ -1,4 +1,4 @@
-    yamldb = require './index'
+    yamldb = require './lib/yamldb'
 
 A basic database model
 
@@ -22,5 +22,6 @@ Initialize database
 Load all objects of model *Fruit*
 
     db.loadFiles 'Fruit', (err, objs) ->
-     console.log err, objs
+     console.log 'Error: ', err
+     console.log 'Data: ', objs
 
