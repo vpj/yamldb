@@ -58,13 +58,15 @@ Loads a single file of type model
     loadFile = (options, callback) ->
      fs.readFile options.file, encoding: 'utf8', (e1, data) =>
       if e1?
-       callback msg: "Error reading file: #{options.file}", err: e1, null
+       callback msg: "Error reading file: #{options.file}", err: e1,
+        new options.model {}, file: options.file
        return
 
       try
        data = YAML.parse data
       catch e2
-       callback msg: "Error parsing file: #{options.file}", err: e2, null
+       callback msg: "Error parsing file: #{options.file}", err: e2,
+        new options.model {}, file: options.file
        return
       callback null, (new options.model data, file: options.file)
 
@@ -127,6 +129,10 @@ Build a model with the structure of defaults. `options.db` is a reference to the
        else
         @values[k] = v
 
+      for k of values
+       if not @_defaults[k]?
+        throw new Error "Unknown property #{k}"
+
 ####Returns key value set
 
      toJSON: -> JSON.parse JSON.stringify @values
@@ -138,8 +144,16 @@ Build a model with the structure of defaults. `options.db` is a reference to the
 ####Set key value combination
 
      set: (obj) ->
+      found = null
       for k, v of obj
-       @values[k] = v if k of @_defaults
+       if @_defaults[k]?
+        @values[k] = v
+       else
+        found = k
+
+      if found?
+       throw new Error "Unknown property #{found}"
+
 
 ###Save the object
 
