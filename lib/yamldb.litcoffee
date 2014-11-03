@@ -20,114 +20,53 @@ Storing the database as separate files lets you use version control systems like
 
     fs = require 'fs'
     YAML = require "yamljs"
+    findFiles = require '../jshelpers/find_files'
 
-Find files in a directory
-
-    findFiles = (dir, callback) ->
-     fileList = []
-     err = []
-
-     callbackCount = 0
-
-     done = ->
-      callbackCount--
-      if callbackCount is 0
-       err = null if err.length is 0
-       callback err, fileList
-
-     recurse = (path) ->
-      callbackCount++
-      fs.readdir path, (e1, files) ->
-       if e1?
-        err.push e1
-        done()
-        return
-
-       for file in files
-        continue if file[0] is '.'
-        do (file) ->
-         f = "#{path}/#{file}"
-         callbackCount++
-         fs.stat f, (e2, stats) ->
-          if e2?
-           err.push e2
-           done()
-           return
-
-          if stats.isDirectory()
-           recurse f
-          else if stats.isFile()
-           fileList.push f
-          done()
-
-       done()
-
-     recurse dir
-
-## Database
-Setup the database with a set of models and a directory. The models will reside in subdirectories with the same name.
-
-Each model should be a subclass of `Model` class.
-
-    class Database
-     constructor: (path, models) ->
-      @models = models
-      @path = path
-
-####Save a model
-
-     save: (model, data, file, callback) ->
-      data = YAML.stringify data, 1000, 1
-      fs.writeFile file, data, encoding: 'utf8', (err) ->
-       callback err
-
-####Load files
+####Load Directory of files
 This will load all the files of type `model` recursing over the subdirectories.
 
-     getPath: (model) -> "#{@path}/#{model}"
+    loadDirectory = (options, callback) ->
+     path = options.path
+     objs = []
+     files = []
+     err = []
+     n = 0
 
-     loadFiles: (model, callback) ->
-      path = "#{@path}/#{model}"
-      objs = []
-      files = []
-      err = []
-      n = 0
+     load = ->
+      if n >= files.length
+       err = null if err.length is 0
+       callback err, objs
+       return
 
-      loadFile = =>
-       if n >= files.length
-        err = null if err.length is 0
-        callback err, objs
-        return
+      loadFile model: options.model, file: files[n], (e, obj) ->
+       if e?
+        err.push e
+       else
+        objs.push obj
+       n++
+       load()
 
-       @loadFile model, files[n], (e, obj) ->
-        if e?
-         err.push e
-        else
-         objs.push obj
-        n++
-        loadFile()
-
-      findFiles path, (e, f) ->
-       err = e
-       err ?= []
-       files = f
-       loadFile()
+     findFiles path, (e, f) ->
+      err = e
+      err ?= []
+      files = f
+      load()
 
 ####Load file
 Loads a single file of type model
 
-     loadFile: (model, file, callback) ->
-      fs.readFile file, encoding: 'utf8', (e1, data) =>
-       if e1?
-        callback msg: "Error reading file: #{file}", err: e1, null
-        return
+    loadFile = (options, callback) ->
+     fs.readFile options.file, encoding: 'utf8', (e1, data) =>
+      if e1?
+       callback msg: "Error reading file: #{options.file}", err: e1, null
+       return
 
-       try
-        data = YAML.parse data
-       catch e2
-        callback msg: "Error parsing file: #{file}", err: e2, null
-        return
-       callback null, new @models[model] data, file: file, db: this
+      try
+       data = YAML.parse data
+      catch e2
+       callback msg: "Error parsing file: #{options.file}", err: e2, null
+       return
+      callback null, (new options.model data, file: options.file)
 
 
 
@@ -177,11 +116,8 @@ Build a model with the structure of defaults. `options.db` is a reference to the
      @initialize (values, options) ->
       @file = options.file
       @isNew = false
-      @db = options.db
       if not @file?
        @isNew = true
-       if options.name?
-        @file = "#{@db.getPath @model}/#{options.name}.yaml"
 
       @values = {}
       values ?= {}
@@ -209,12 +145,14 @@ Build a model with the structure of defaults. `options.db` is a reference to the
 
      save: (callback) ->
       return unless @file?
-
       @isNew = false
-      @db.save @model, @toJSON(), @file, callback
 
+      data = YAML.stringify @toJSON(), 1000, 1
+      fs.writeFile @file, data, encoding: 'utf8', (err) ->
+       callback err
 
 #Exports
 
-    exports.Database = Database
+    exports.loadFile = loadFile
+    exports.loadDirectory = loadDirectory
     exports.Model = Model

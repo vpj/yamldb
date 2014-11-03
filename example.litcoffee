@@ -12,16 +12,9 @@ A basic database model
       description: ''
       images: []
 
-    models =
-     Fruit: Fruit
-
-Initialize database
-
-    db = new yamldb.Database 'testdata', models
-
 Load all objects of model *Fruit*
 
-    db.loadFiles 'Fruit', (err, objs) ->
+    yamldb.loadDirectory model: Fruit, path: 'testdata', (err, objs) ->
      console.log 'Error: ', err
      console.log 'Data: ', objs
 

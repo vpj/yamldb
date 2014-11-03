@@ -1,0 +1,3 @@
+[submodule "jshelpers"]
+	path = jshelpers
+	url = git@github.com:vpj/jshelpers.git
