@@ -1,10 +1,16 @@
 #YAML Database
 
-YAML database is a document database which stores documents as YAML files. The documents in the database can be maintained by simply editing the yaml files.
+YAML database is a document database which stores documents as YAML files.
+The documents in the database can be maintained by simply editing the yaml
+files.
 
-This database was designed to be used for systems like CMS systems, where an easy way to edit data is necessary and the number of data objects is not very high. It can be also used to store settings and configurations.
+This database was designed to be used for systems like CMS systems,
+where an easy way to edit data is necessary and the number of data objects
+is not very high. It can be also used to store settings and configurations.
 
-Storing the database as separate files lets you use version control systems like git on the database, which is again ideal for storing settings, configurations, blog posts and CMS content.
+Storing the database as separate files lets you use version control systems
+like git on the database, which is again ideal for storing settings,
+configurations, blog posts and CMS content.
 
 ###Advantages
 * Can easily change database entries
@@ -56,7 +62,7 @@ This will load all the files of type `model` recursing over the subdirectories.
 Loads a single file of type model
 
     loadFile = (options, callback) ->
-     fs.readFile options.file, encoding: 'utf8', (e1, data) =>
+     fs.readFile options.file, encoding: 'utf8', (e1, data) ->
       if e1?
        callback msg: "Error reading file: #{options.file}", err: e1,
         new options.model {}, file: options.file
@@ -74,16 +80,20 @@ Loads a single file of type model
 
 
 ## Model class
-Introduces class level function initialize and include. This class is the base class of all other data models. It has `get` and `set` methods to change values. The structure of the object is defined by `defaults`.
+Introduces class level function initialize and include.
+This class is the base class of all other data models.
+It has `get` and `set` methods to change values. The structure of
+the object is defined by `defaults`.
 
     class Model
      constructor: ->
-      @_init.apply @, arguments
+      @_init.apply this, arguments
 
      _initialize: []
 
 ####Register initialize functions.
-All initializer funcitons in subclasses will be called with the constructor arguments.
+All initializer funcitons in subclasses will be called with the
+constructor arguments.
 
      @initialize: (func) ->
       @::_initialize = @::_initialize.slice()
@@ -91,14 +101,15 @@ All initializer funcitons in subclasses will be called with the constructor argu
 
      _init: ->
       for init in @_initialize
-       init.apply @, arguments
+       init.apply this, arguments
 
 ####Include objects.
-You can include objects by registering them with @include. This solves the problem of single inheritence.
+You can include objects by registering them with @include. This solves
+the problem of single inheritence.
 
      @include: (obj) ->
-      for k, v of obj when not @::[k]?
-       @::[k] = v
+      for k, v of obj when not this::[k]?
+       this::[k] = v
 
 
      model: 'Model'
@@ -113,7 +124,10 @@ Subclasses can add to default key-values of parent classes
       for k, v of defaults
        @::_defaults[k] = v
 
-Build a model with the structure of defaults. `options.db` is a reference to the `Database` object, which will be used when updating the object. `options.file` is the path of the file, which will be null if this is a new object.
+Build a model with the structure of defaults. `options.db` is a reference
+to the `Database` object, which will be used when updating the object.
+`options.file` is the path of the file, which will be null if this is
+a new object.
 
      @initialize (values, options) ->
       @file = options.file
