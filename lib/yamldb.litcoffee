@@ -141,7 +141,7 @@ a new object.
        if values[k]?
         @values[k] = values[k]
        else
-        @values[k] = v
+        @values[k] = JSON.parse JSON.stringify v
 
       for k of values
        if not @_defaults[k]?
