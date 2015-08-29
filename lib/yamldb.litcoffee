@@ -74,7 +74,10 @@ Loads a single file of type model
        callback msg: "Error parsing file: #{options.file}", err: e2,
         new options.model {}, file: options.file
        return
-      callback null, (new options.model data, file: options.file)
+      if options.model?
+       callback null, (new options.model data, file: options.file)
+      else
+       callback null, data
 
 
 
